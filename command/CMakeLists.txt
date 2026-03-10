@@ -1,0 +1,20 @@
+project(command_comm)
+
+# Find all source files
+file(GLOB CLIENT_SOURCES "command_client.cpp")
+
+file(GLOB SERVER_SOURCES "command_server.h" "command_server.cpp")
+
+# client executable
+add_executable(command_client ${CLIENT_SOURCES})
+
+# server library
+add_library(command_server ${SERVER_SOURCES})
+
+# Compiler features
+target_compile_features(command_client PUBLIC cxx_std_17)
+target_compile_features(command_server PUBLIC cxx_std_17)
+if(MSVC)
+    target_compile_options(command_client PRIVATE /bigobj)
+    target_compile_options(command_server PRIVATE /bigobj)
+endif()

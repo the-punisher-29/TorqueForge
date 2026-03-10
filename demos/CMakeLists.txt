@@ -1,0 +1,83 @@
+# Demos directory
+
+# ---- Common code shared by all demos ----
+#add_library(demo_common STATIC
+#    ${CMAKE_CURRENT_SOURCE_DIR}/common/demo_common.cpp
+#)
+
+# demo_common should see its own headers + everything demos see
+#target_include_directories(demo_common
+#    PUBLIC
+#       ${CMAKE_CURRENT_SOURCE_DIR}/common
+#    PRIVATE
+#        ${CMAKE_CURRENT_SOURCE_DIR}/../featherstone
+#        ${CMAKE_CURRENT_SOURCE_DIR}/../renderer
+#        ${CMAKE_CURRENT_SOURCE_DIR}/../loader
+#        ${CMAKE_CURRENT_SOURCE_DIR}/../command
+#        ${EIGEN3_INCLUDE_DIR}
+#        ${GLM_INCLUDE_DIR}
+#        ${RAYLIB_INCLUDE_DIR}
+#        ${BULLET_INCLUDE_DIR}
+#        ${NLOHMANN_JSON_INCLUDE_DIR}
+#)
+
+# Function to create a demo executable
+function(add_demo demo_name source_file)
+    # Create executable
+    add_executable(${demo_name} ${source_file}  ${CMAKE_CURRENT_SOURCE_DIR}/common/demo_common.cpp)
+    # Include directories from libraries AND dependencies
+    target_include_directories(${demo_name}
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/common
+            ${CMAKE_CURRENT_SOURCE_DIR}/../featherstone
+            ${CMAKE_CURRENT_SOURCE_DIR}/../renderer
+            ${CMAKE_CURRENT_SOURCE_DIR}/../loader
+            ${CMAKE_CURRENT_SOURCE_DIR}/../command
+            ${RAYLIB_INCLUDE_DIR}
+            ${EIGEN3_INCLUDE_DIR}
+            ${GLM_INCLUDE_DIR}
+            ${BULLET_INCLUDE_DIR}
+            ${NLOHMANN_JSON_INCLUDE_DIR}
+    )
+
+    # Link against our libraries AND raylib + demo_common
+    target_link_libraries(${demo_name}
+        PRIVATE
+            #demo_common
+            featherstone
+            renderer
+            loader
+            command_server
+            ${RAYLIB_LIBRARY}
+            ${BULLET_COLLISION_LIBRARY}
+            ${BULLET_LINEARMATH_LIBRARY}
+    )
+
+    if(NOT WIN32)
+        target_link_libraries(${demo_name} PRIVATE m pthread dl rt X11 Xrandr Xinerama Xi Xcursor GL)
+    endif()
+
+    # Set output directory
+    set_target_properties(${demo_name} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/demos
+    )
+
+    # Pass the scene directory path to C++ as a preprocessor macro
+    target_compile_definitions(${demo_name}
+        PRIVATE
+            SCENES_DIR="${SCENES_DIR}"
+            DEMO_NAME="${demo_name}"
+    )
+endfunction()
+
+# Find all demo source files (only top-level .cpp, not ./common/*.cpp)
+file(GLOB DEMO_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+)
+
+# Create a demo for each source file
+foreach(demo_source ${DEMO_SOURCES})
+    get_filename_component(demo_name ${demo_source} NAME_WE)
+    add_demo(${demo_name} ${demo_source})
+    list(APPEND ALL_DEMOS ${demo_name})
+endforeach()

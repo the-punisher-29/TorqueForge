@@ -1,0 +1,29 @@
+project(featherstone)
+
+# Find all source files
+file(GLOB_RECURSE FEATHERSTONE_SOURCES 
+    "*.cpp"
+    "*.c"
+)
+
+file(GLOB_RECURSE FEATHERSTONE_HEADERS 
+    "*.hpp"
+    "*.h"
+)
+
+# Create library
+add_library(featherstone ${FEATHERSTONE_SOURCES} ${FEATHERSTONE_HEADERS})
+
+# Include directories - Eigen is required for featherstone
+target_include_directories(featherstone 
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+    PRIVATE
+        ${EIGEN3_INCLUDE_DIR}
+        ${BULLET_INCLUDE_DIR}
+)
+
+# Compiler features
+target_compile_features(featherstone PUBLIC cxx_std_17)
+if(MSVC)
+    target_compile_options(featherstone PRIVATE /bigobj)
+endif()

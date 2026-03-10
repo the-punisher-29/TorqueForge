@@ -1,0 +1,63 @@
+project(renderer)
+
+# Find all source files
+file(GLOB_RECURSE RENDERER_SOURCES 
+    "*.cpp"
+    "*.c"
+)
+
+file(GLOB_RECURSE RENDERER_HEADERS 
+    "*.hpp"
+    "*.h"
+)
+
+# Find ALL shader files
+file(GLOB_RECURSE SHADER_FILES
+    "shaders/*.vs"
+    "shaders/*.fs"
+)
+
+# Create library
+add_library(renderer ${RENDERER_SOURCES} ${RENDERER_HEADERS})
+
+# Include directories
+target_include_directories(renderer 
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+    PRIVATE
+        ${GLM_INCLUDE_DIR}
+        ${RAYLIB_INCLUDE_DIR}
+        ${NLOHMANN_JSON_INCLUDE_DIR}
+)
+
+# Link libraries
+target_link_libraries(renderer PRIVATE ${RAYLIB_LIBRARY})
+if(WIN32)
+    target_link_libraries(renderer PRIVATE winmm)
+else()
+    target_link_libraries(renderer PRIVATE m pthread dl rt X11 Xrandr Xinerama Xi Xcursor GL)
+endif()
+
+# Compiler features
+target_compile_features(renderer PUBLIC cxx_std_17)
+
+# Define the shader path macro for C++
+set(SHADER_DIR "${CMAKE_BINARY_DIR}/renderer/shaders/")
+
+# Create custom command to copy shaders whenever they change
+add_custom_target(copy_shaders ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADER_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/shaders
+        ${SHADER_DIR}
+    COMMENT "Copying shaders to ${SHADER_DIR}"
+    DEPENDS ${SHADER_FILES}
+)
+
+# Make renderer depend on the shader copy target
+add_dependencies(renderer copy_shaders)
+
+# Pass the shader directory path to C++ as a preprocessor macro
+target_compile_definitions(renderer 
+    PRIVATE 
+        SHADER_DIR="${SHADER_DIR}"
+)
