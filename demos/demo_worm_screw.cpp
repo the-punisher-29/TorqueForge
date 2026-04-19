@@ -149,7 +149,8 @@ int main(int argc, char** argv) {
 
 		if (pi_online) {
 			error = dq_target - worm_screw->dq(0);
-			I += error / 60.0f; // may explode if stalls
+			I += error / 60.0f;
+			I = std::clamp(I, -20.0f, 20.0f);
 
 			worm_screw->taue(0) = kp * error + ki * I;
 		}

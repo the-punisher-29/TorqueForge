@@ -196,6 +196,10 @@ void ArticulatedBody::integrate_velocity(float dt) {
 	for (int i = 1; i < tree_joints.size(); ++i) {
 		std::shared_ptr<Joint> j = tree_joints[i];
 		j->dq += j->ddq * dt;
+		if (!j->dq.allFinite()) {
+			j->dq.setZero();
+			j->ddq.setZero();
+		}
 	}
 
 	// TODO: this should be useless. As contact solver only uses joint space velocity 

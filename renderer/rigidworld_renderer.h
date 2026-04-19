@@ -29,6 +29,7 @@ public:
 			{ 15.0f, 15.0f, 15.0f } 
 		};
 		std::string app_name = "app";
+		bool fullscreen = false;
 	};
 
 	RigidWorldRenderer(Config config);

@@ -1,0 +1,18 @@
+{
+    "cam": {
+        "fovy": 55.0,
+        "position": [16.0, 10.0, 22.0],
+        "projection": 0,
+        "target": [0.0, 2.0, 0.0],
+        "up": [0.0, 1.0, 0.0]
+    },
+    "fps": 60,
+    "fullscreen": true,
+    "light_dir": [-0.5, -1.0, -0.4],
+    "screen_height": 1080,
+    "screen_width": 1920,
+    "world_aabb": {
+        "max": [6.0, 9.0, 11.0],
+        "min": [-6.0, -4.0, -11.0]
+    }
+}

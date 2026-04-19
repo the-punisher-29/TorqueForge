@@ -71,9 +71,11 @@ RigidWorldRenderer::RigidWorldRenderer(Config config) {
 
     _camera = config.cam;
 
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE);
     InitWindow(config.screen_width, config.screen_height, "Rigid World Renderer");
+    if (config.fullscreen) {
+        ToggleFullscreen();
+    }
 
     build_shaders(config);
     build_textures();
@@ -118,6 +120,7 @@ void RigidWorldRenderer::save_config_json() {
     // raylib does not expose target FPS; GetFPS() is "current measured FPS".
     // If you want the target FPS, store it as a member and serialize that instead.
     j["fps"] = 60.0f;
+    j["fullscreen"] = IsWindowFullscreen();
 
     // Camera
     j["cam"] = {
@@ -180,6 +183,8 @@ bool RigidWorldRenderer::load_config_json(Config& cfg) {
     // FPS
     if (j.contains("fps") && j["fps"].is_number_integer())
         cfg.fps = j["fps"].get<int>();
+    if (j.contains("fullscreen") && j["fullscreen"].is_boolean())
+        cfg.fullscreen = j["fullscreen"].get<bool>();
 
     // Camera
     if (j.contains("cam") && j["cam"].is_object()) {
@@ -513,8 +518,16 @@ void RigidWorldRenderer::run(
     }
 }
 
+static bool is_body_finite(const RigidWorldRenderer::Body& b) {
+    const glm::vec3& t = b.translation;
+    const glm::quat& r = b.rotation;
+    return std::isfinite(t.x) && std::isfinite(t.y) && std::isfinite(t.z)
+        && std::isfinite(r.x) && std::isfinite(r.y) && std::isfinite(r.z) && std::isfinite(r.w);
+}
+
 void RigidWorldRenderer::draw_renderables() {
     for (Body& b : _bodies) {
+        if (!is_body_finite(b)) continue;
         Vector3 axis = V3(glm::axis(b.rotation));
         // TODO: using degrees?
         float angle_deg = glm::degrees(glm::angle(b.rotation));
@@ -526,6 +539,7 @@ void RigidWorldRenderer::draw_renderables() {
 void RigidWorldRenderer::draw_colliders() {
     rlDisableBackfaceCulling();
     for (Body& b : _bodies) {
+        if (!is_body_finite(b)) continue;
         Vector3 axis = V3(glm::axis(b.rotation));
         // TODO: using degrees?
         float angle_deg = glm::degrees(glm::angle(b.rotation));

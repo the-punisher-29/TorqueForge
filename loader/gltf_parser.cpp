@@ -1028,7 +1028,7 @@ static bool parse_extensions() {
 	return true;
 }
 
-static bool build_and_flatten_articulation_links(ArticulationForest& forest)
+static bool build_and_flatten_articulation_links(ArticulationForest& forest, const SceneGraph& scene)
 {
 	std::vector<ArticulationLinkage> links;
 	for (auto& p : g_id_link_map) {
@@ -1110,14 +1110,24 @@ static bool build_and_flatten_articulation_links(ArticulationForest& forest)
 	}
 
 	// Group any remaining edges (cycles / components with no root).
+	// Prefer starting from a static body so it becomes art_group[0].
 	for (;;) {
 		int start = -1;
+		int fallback = -1;
 		for (const auto& [p, edges] : adj) {
 			for (int ei : edges) {
-				if (!edge_used[ei]) { start = p; break; }
+				if (!edge_used[ei]) {
+					if (fallback == -1) fallback = p;
+					if (p < (int)scene.size() && scene[p].physical &&
+						scene[p].physical->dyn_type == Physical::DynamicType::Static) {
+						start = p;
+						break;
+					}
+				}
 			}
 			if (start != -1) break;
 		}
+		if (start == -1) start = fallback;
 		if (start == -1) break;
 
 		auto comp = bfs_from_start(start);
@@ -1199,7 +1209,7 @@ bool load_gltf(const std::string& filename, Scene& scene, GLTFParseOption opt) {
 
 	// build the tree of articulation
 	scene.art_forest.clear();
-	if (!build_and_flatten_articulation_links(scene.art_forest)) {
+	if (!build_and_flatten_articulation_links(scene.art_forest, scene.graph)) {
 		std::cout << "Error bulding articulation forest" << std::endl;
 		return false;
 	}

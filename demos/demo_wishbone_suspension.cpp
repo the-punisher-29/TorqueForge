@@ -157,7 +157,8 @@ int main(int argc, char** argv) {
 			float turning_angle = aa.axis.y() * aa.angle;
 
 			float error = wheel_rotate_target - turning_angle;
-			I += error / 60.0f; // may explode if stalls
+			I += error / 60.0f;
+			I = std::clamp(I, -10.0f, 10.0f);
 			steering->taue(0) = kp * error + ki * I + kd * steering->dq(0);
 		}
 
