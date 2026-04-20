@@ -63,11 +63,14 @@ Run-Demo "Spherical Joint Chain — 3-DOF Joints" `
 Run-Demo "Spring Scale — Torque Balance" `
     "$Demos\demo_spring_scale.exe"
 
-Run-Demo "Wishbone Suspension — Double A-Arm with PID" `
-    "$Demos\demo_wishbone_suspension.exe"
-
-Run-Demo "Worm-Screw Drive — Gear Transmission & Lead Screw" `
-    "$Demos\demo_worm_screw.exe"
+Write-Host ""
+Write-Host ("━" * 60) -ForegroundColor Yellow
+Write-Host "  DEMO: Chain Pendulum — Scaling Benchmark (30 links)" -ForegroundColor Yellow
+Write-Host "  (Close the window or press ESC to advance)" -ForegroundColor DarkGray
+Write-Host ("━" * 60) -ForegroundColor Yellow
+Start-Sleep -Seconds 1
+Set-Location $Root
+& "$Demos\demo_chain_pendulum.exe" 30
 
 Write-Host ""
 Write-Host "==> Presentation complete." -ForegroundColor Green

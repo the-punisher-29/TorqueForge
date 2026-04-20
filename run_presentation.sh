@@ -62,13 +62,9 @@ run_demo "Spherical Joint Chain — 3-DOF Joints" \
 run_demo "Spring Scale — Torque Balance" \
     "\"$DEMOS/demo_spring_scale\""
 
-# 6. Wishbone suspension (double A-arm, PID-controlled)
-run_demo "Wishbone Suspension — Double A-Arm with PID" \
-    "\"$DEMOS/demo_wishbone_suspension\""
-
-# 7. Worm-screw drive (worm gear + lead screw, PID-controlled)
-run_demo "Worm-Screw Drive — Gear Transmission & Lead Screw" \
-    "\"$DEMOS/demo_worm_screw\""
+# 6. Chain pendulum (N-link scaling benchmark for Featherstone dynamics)
+run_demo "Chain Pendulum — Scaling Benchmark (30 links)" \
+    "\"$DEMOS/demo_chain_pendulum\" 30"
 
 echo ""
 echo "==> Presentation complete."
