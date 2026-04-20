@@ -131,12 +131,51 @@ cmake --build . --parallel
 
 ## Run
 
+### Combined run — all demos in sequence (recommended)
+
+Launches every demo one after another, in fullscreen. Close the window or press `ESC` to advance to the next one.
+
+**Linux / macOS**
+```bash
+./run_presentation.sh                # build (Release) then run all demos
+./run_presentation.sh --no-rebuild   # skip build, just run
+```
+
+**Windows (PowerShell)**
+```powershell
+.\run_presentation.ps1               # build (Release) then run all demos
+.\run_presentation.ps1 -NoRebuild    # skip build, just run
+```
+
+Both scripts walk through the same sequence:
+
+| # | Demo | Highlights |
+|---|---|---|
+| 1 | Wrecking Ball | Free rigid bodies, impulse-based contact |
+| 2 | Scissorlift | Closed kinematic chain / loop closure |
+| 3 | Spring | Prismatic joint + spring-damper |
+| 4 | Spherical Joint Chain | 3-DOF joints |
+| 5 | Spring Scale | Torque balance |
+| 6 | Chain Pendulum (N=30) | Featherstone scaling benchmark |
+
+The Linux script exports `__NV_PRIME_RENDER_OFFLOAD=1` / `__GLX_VENDOR_LIBRARY_NAME=nvidia` automatically, so hybrid-GPU laptops use the dedicated card without extra flags.
+
+### Run an individual demo
+
 ```bash
 # List available demos
 ls build/bin/demos/
 
-# Run a demo (from project root)
+# Run a single demo (from project root — renderer config JSONs resolve from CWD)
 ./build/bin/demos/demo_load_scene
+
+# Scene-selecting demos read a digit from stdin
+echo 0 | ./build/bin/demos/demo_load_scene_articulated   # scissorlift
+echo 1 | ./build/bin/demos/demo_load_scene_articulated   # spring
+echo 2 | ./build/bin/demos/demo_load_scene_articulated   # spherical joint chain
+
+# Chain pendulum takes N as argv (default 30)
+./build/bin/demos/demo_chain_pendulum 30
 
 # Linux with NVIDIA dedicated GPU (hybrid laptops)
 __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia ./build/bin/demos/demo_load_scene
