@@ -1,6 +1,6 @@
 # TorqueForge — Interactive Rotational Dynamics Visualization
 
-**Computer Graphics — CSL7040 Course Project**
+**Computer Graphics — CSL7450 Course Project**
 
 An articulated body physics engine for interactive rotational mechanics demos, built on the Featherstone Articulated Body Algorithm.
 
